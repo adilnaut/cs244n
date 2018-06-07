@@ -39,13 +39,26 @@ def forward_backward_prop(X, labels, params, dimensions):
     b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
 
     # Note: compute cost based on `sum` not `mean`.
-    ### YOUR CODE HERE: forward propagation
-    raise NotImplementedError
+    h1 = X.dot(W1) + b1 # (M, H)
+    a1 = sigmoid(h1)
+
+    h2 = a1.dot(W2) + b2 # (M, Dy)
+    scores = softmax(h2)
+    cost = -np.sum( np.log(scores) * labels )
     ### END YOUR CODE
 
     ### YOUR CODE HERE: backward propagation
-    raise NotImplementedError
-    ### END YOUR CODE
+    gradh2 = scores - labels
+
+    gradW2 = a1.T.dot(gradh2)
+    gradb2 = np.sum(gradh2, axis=0)
+
+    grada1 = gradh2.dot(W2.T)
+
+    gradh1 = grada1 * sigmoid_grad(a1)
+
+    gradW1 = X.T.dot(gradh1)
+    gradb1 = np.sum(gradh1, axis=0)
 
     ### Stack gradients (do not modify)
     grad = np.concatenate((gradW1.flatten(), gradb1.flatten(),
@@ -59,13 +72,13 @@ def sanity_check():
     Set up fake data and parameters for the neural network, and test using
     gradcheck.
     """
-    print "Running sanity check..."
+    print ("Running sanity check...")
 
     N = 20
     dimensions = [10, 5, 10]
     data = np.random.randn(N, dimensions[0])   # each row will be a datum
     labels = np.zeros((N, dimensions[2]))
-    for i in xrange(N):
+    for i in range(N):
         labels[i, random.randint(0,dimensions[2]-1)] = 1
 
     params = np.random.randn((dimensions[0] + 1) * dimensions[1] + (
@@ -82,7 +95,7 @@ def your_sanity_checks():
     This function will not be called by the autograder, nor will
     your additional tests be graded.
     """
-    print "Running your sanity checks..."
+    print ("Running your sanity checks...")
     ### YOUR CODE HERE
     raise NotImplementedError
     ### END YOUR CODE
@@ -90,4 +103,4 @@ def your_sanity_checks():
 
 if __name__ == "__main__":
     sanity_check()
-    your_sanity_checks()
+    # your_sanity_checks()

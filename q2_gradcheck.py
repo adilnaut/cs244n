@@ -35,12 +35,19 @@ def gradcheck_naive(f, x):
         # Make sure you call random.setstate(rndstate)
         # before calling f(x) each time. This will make it possible
         # to test cost functions with built in randomness later.
-        print(x[ix])
-        print(f(x[ix]))
-#        print(f(x[ix] - h)[0])
-        numgrad = (f(x[ix] + h)[0] - f(x[ix] - h)[0])/2*h
+
         ### YOUR CODE HERE:
-#        (fx(x + h) + fx(x-h))/2h
+        x_tmp = x[ix]
+        x[ix] = x_tmp + h
+        random.setstate(rndstate)
+        fx_h, _ = f(x)
+        x[ix] = x_tmp - h
+        random.setstate(rndstate)
+        fx, _ = f(x)
+        print(fx_h)
+        print(fx)
+        numgrad = (fx_h - fx) / (2 * h)
+        x[ix] = x_tmp
         ### END YOUR CODE
 
         # Compare gradients
@@ -67,7 +74,7 @@ def sanity_check():
     gradcheck_naive(quad, np.array(123.456))      # scalar test
     gradcheck_naive(quad, np.random.randn(3,))    # 1-D test
     gradcheck_naive(quad, np.random.randn(4,5))   # 2-D test
-    
+
 
 
 def your_sanity_checks():
